@@ -1,6 +1,5 @@
 package com.junbin.compose_toss.view
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +27,7 @@ import com.junbin.compose_toss.view.components.TopBarModule
 import com.junbin.compose_toss.view.screens.BoonPage
 import com.junbin.compose_toss.view.screens.HomePage
 import com.junbin.compose_toss.view.screens.MenuPage
-import com.junbin.compose_toss.view.screens.StockPage
+import com.junbin.compose_toss.view.screens.stockPage.StockPage
 import com.junbin.compose_toss.view.screens.TossPayPage
 import com.junbin.compose_toss.view.ui.theme.BottomNavigationBorderColor
 
