@@ -49,9 +49,6 @@ fun MainScreen() {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopBarModule()
-        },
         bottomBar = {
             NavigationBar(
                 modifier = Modifier

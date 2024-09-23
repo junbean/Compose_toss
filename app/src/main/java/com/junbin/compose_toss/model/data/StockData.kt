@@ -4,5 +4,8 @@ import android.os.Parcelable
 
 data class StockData(
     val name: String,
-    val change: Double
+    val price: Int,
+    val change: Double,
+    val unit: String,
+    val stockImage: Int
 )

@@ -22,9 +22,14 @@ val BottomNavigationBorderColor = Color.LightGray
 //TopBar Animated Text
 val IncreaseTextColor = Color.Red
 val DecreaseTextColor = Color.Blue
+val NoChangeTextColor = Color.LightGray
 val TabSelectedTextColor = Color.Black
 val TabUnselectedTextColor = Color.Gray
 val TabIndicatorColor = Color.Black
+
+//recommend stock module
+val IncreaseStockBoxColor = Color(0xFFFFEBEB)
+val DecreaseStockBoxColor = Color(0xFFEBF4FF)
 
 //common
 val CommonRowBoxColor = Color(0xFFEFEFEF)
@@ -36,9 +41,10 @@ val CommonRowBoxIconColor = Color.Gray
 
 //partition
 val PartitionColor = Color(0xFFEFEFEF)
+val DivideLineColor = Color(0xFFEFEFEF)
 
 //default text color
 val DefaultTextColor = Color.Black
 val DefaultDarkTextColor = Color.DarkGray
-val DefaultFadedTextColor = Color.Gray
+val DefaultGrayTextColor = Color.Gray
 
