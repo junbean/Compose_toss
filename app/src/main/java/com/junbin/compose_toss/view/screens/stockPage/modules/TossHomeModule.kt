@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,12 +21,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
@@ -43,12 +48,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.junbin.compose_toss.R
@@ -56,10 +64,13 @@ import com.junbin.compose_toss.model.data.LooAroundData
 import com.junbin.compose_toss.model.data.NewsData
 import com.junbin.compose_toss.model.data.StockData
 import com.junbin.compose_toss.view.components.CommonRowItem
+import com.junbin.compose_toss.view.components.NoRippleInteractionSource
+import com.junbin.compose_toss.view.components.customTabIndicatorOffset
 import com.junbin.compose_toss.view.ui.theme.BackgroundColor
 import com.junbin.compose_toss.view.ui.theme.CommonRowBoxColor
 import com.junbin.compose_toss.view.ui.theme.DecreaseStockBoxColor
 import com.junbin.compose_toss.view.ui.theme.DecreaseTextColor
+import com.junbin.compose_toss.view.ui.theme.DefaultBackgroundColor
 import com.junbin.compose_toss.view.ui.theme.DefaultDarkTextColor
 import com.junbin.compose_toss.view.ui.theme.DefaultGrayTextColor
 import com.junbin.compose_toss.view.ui.theme.DefaultTextColor
@@ -151,8 +162,18 @@ fun LastSeenStockModule() {
 //관심 종목
 @Composable
 fun WatchListModule() {
-    val tabItems = listOf("주식", "채권", "기본")
     var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val expandStates = remember { List(3) { mutableStateOf(false) } }
+    val tabItems = listOf("주식", "채권", "기본")
+
+    val density = LocalDensity.current
+    val tabWidths = remember {
+        val tabWidthStateList = mutableStateListOf<Dp>()
+        repeat(tabItems.size) {
+            tabWidthStateList.add(0.dp)
+        }
+        tabWidthStateList
+    }
 
     val stockList = listOf(
         StockData("삼성중공업", 10920, 2.7, "원", R.drawable.stock_samsung_img),
@@ -199,10 +220,15 @@ fun WatchListModule() {
                 modifier = Modifier.fillMaxWidth(),
                 containerColor = BackgroundColor,
                 contentColor = TabUnselectedTextColor,
-                edgePadding = 16.dp,
+                edgePadding = 0.dp,
                 indicator = { tabPositions ->
                     TabRowDefaults.SecondaryIndicator(
-                        modifier = Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                        modifier = Modifier
+                            .customTabIndicatorOffset(
+                                currentTabPosition = tabPositions[selectedTabIndex],
+                                tabWidth = tabWidths[selectedTabIndex]
+                            )
+                            .width(width = tabPositions[selectedTabIndex].width),       // 각 Tab의 너비에 맞추어 인디케이터 너비 설정
                         color = TabIndicatorColor
                     )
                 },
@@ -212,12 +238,16 @@ fun WatchListModule() {
                     Tab(
                         selected = selectedTabIndex == index,
                         onClick = { selectedTabIndex = index },
+                        interactionSource = NoRippleInteractionSource(),
                         text = {
                             Text(
                                 text = title,
-                                fontSize = 16.sp,
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = if (selectedTabIndex == index) TabSelectedTextColor else TabUnselectedTextColor
+                                color = if (selectedTabIndex == index) TabSelectedTextColor else TabUnselectedTextColor,
+                                onTextLayout = { textLayoutResult ->
+                                    tabWidths[index] = with(density) { textLayoutResult.size.width.toDp() }
+                                }
                             )
                         },
                     )
@@ -231,10 +261,14 @@ fun WatchListModule() {
                     .background(DivideLineColor),
             )
 
-
-            // 선택된 탭에 따른 내용 표시
-            when (selectedTabIndex) {
-                0 ->
+            tabItems.forEachIndexed { index, title ->
+                WatchListPartModule(
+                    title = title,
+                    itemList = stockList,
+                    isSelected = selectedTabIndex == index,
+                    isExpanded = expandStates[index].value,
+                    onToggleExpand = { expandStates[index].value = !expandStates[index].value }
+                )
             }
         }
     }
@@ -434,12 +468,13 @@ fun LookAroundModule() {
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = 16.dp), //lazyRow 자체 패딩
             horizontalArrangement = Arrangement.spacedBy(16.dp)  //내부 아이템 패딩
+
         ) {
             itemsIndexed(lookAroundList) { index, item ->
                 LookAroundBoxModule(item)
             }
-
         }
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -495,9 +530,7 @@ fun NewsPartModule(news: NewsData) {
                         text = stock.name,
                         fontSize = 14.sp,
                     )
-
                     Spacer(modifier = Modifier.width(4.dp))
-
                     Text(
                         text = when {
                             stock.change > 0 -> "+${stock.change}%"
@@ -511,6 +544,7 @@ fun NewsPartModule(news: NewsData) {
                         },
                         fontSize = 14.sp,
                     )
+                    Spacer(modifier = Modifier.width(8.dp))
                 }
             }
             //기사 내용
@@ -739,55 +773,189 @@ fun PreviewLookAroundBoxModule() {
 }
 
 @Composable
-fun WatchListPartModule(title: String, itemList: List<StockData>) {
-    var isPressed by remember { mutableStateOf(false) }
-    var isMore = false
+fun WatchListPartModule(
+    title: String,
+    itemList: List<StockData>,
+    isSelected: Boolean,
+    isExpanded: Boolean,
+    onToggleExpand: () -> Unit
+) {
+    //탭으로 선택시 확장 --> isSelected == true -> expand
+    //컴포넌트 클릭시 확장 --> isPressed == true -> expand
+    //컴포넌트 한번 더 클릭시 축소 --> isPressed == false -> close
 
-    val rowScale by animateFloatAsState(
-        targetValue = if (isPressed) 0.95f else 1f,
-        label = "Row Scale Animation"
-    )
-
-    Column {
-        Box(
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Row(
             modifier = Modifier
-                .scale(rowScale)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                            isPressed = true
-                            tryAwaitRelease() // 사용자가 눌렀다가 뗄 때까지 기다림
-                            isPressed = false
-                        }
-                    )
-                }
+                .fillMaxWidth()
+                .height(IntrinsicSize.Max)
+                .background(DefaultBackgroundColor)
+                .clickable { onToggleExpand() }
+                .padding(24.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
+            Text(
+                text = title,
+                color = DefaultDarkTextColor,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+            )
+            Icon(
+                imageVector = if (!isExpanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,  // 이미지 벡터 수정
+                contentDescription = "news image",
+                tint = DefaultDarkTextColor
+            )
+        }
+
+        //확장시 보이는 뷰
+        if (isExpanded) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(IntrinsicSize.Max)
-                    .padding(horizontal = 24.dp, vertical = 8.dp),
+                    .padding(horizontal = 24.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.Start,
             ) {
-                Text(text = title, color = DefaultDarkTextColor, fontSize = 18.sp, )
-                Icon(
-                    Icon = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "news image",
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.LightGray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_pyo_chart),
+                        contentDescription = "stock image",
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = "표로 자세히 보기",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = DefaultDarkTextColor
+                )
+                Image(
+                    imageVector = Icons.AutoMirrored.Default.KeyboardArrowRight,
+                    contentDescription = null,
                 )
             }
+            Spacer(modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 24.dp)
+                .height(1.dp)
+                .background(DivideLineColor)
+            )
 
-        }
-
-        if (!isMore) {
             itemList.forEach { item ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Max)
+                        .padding(horizontal = 24.dp, vertical = 14.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxHeight(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Image(
+                            painter = painterResource(id = item.stockImage),
+                            contentDescription = "stock image",
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .fillMaxHeight(),
+                            contentScale = ContentScale.Crop
+                        )
 
+                        Spacer(modifier = Modifier.width(16.dp))
+
+                        Text(
+                            text = item.name,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp,
+                            color = DefaultDarkTextColor,
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Text(
+                            text = "${item.change}%",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = "${item.price}${item.unit}",
+                            fontSize = 14.sp,
+                            color = DefaultGrayTextColor
+                        )
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Max)
+                    .padding(horizontal = 24.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color.LightGray),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_add),
+                        contentDescription = "stock image",
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = "추가하기",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = DefaultGrayTextColor,
+                )
             }
         }
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewWatchListPartModule() {
+    val itemList = listOf(
+        StockData("삼성중공업", 10920, 2.7, "원", R.drawable.stock_samsung_img),
+        StockData("하이브", 158000, -1.2, "원", R.drawable.stock_hybe_img)
+    )
 
+    WatchListPartModule(
+        "주식",
+        itemList = itemList,
+        isSelected = true,
+        isExpanded = true,
+        onToggleExpand = { }
+    )
+}
 
 /*
 LazyColumn(
@@ -800,6 +968,48 @@ LazyColumn(
     }
 }
 
+Box(
+    modifier = Modifier
+        .scale(rowScale)
+        .pointerInput(Unit) {
+            detectTapGestures(
+                onPress = {
+                    isPressed = true
+                    tryAwaitRelease()
+                    isPressed = false
+                }
+            )
+        }
+        .clickable { isMore = !isMore }
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(IntrinsicSize.Max)
+            .padding(horizontal = 24.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(text = title, color = DefaultDarkTextColor, fontSize = 18.sp, )
+        Icon(
+            Icon = Icons.Default.KeyboardArrowDown,
+            contentDescription = "news image",
+        )
+    }
+
+}
+
+if (!isMore) {
+    itemList.forEach { item ->
+
+    }
+}
+
+
+val backgroundColor by animateColorAsState(
+    targetValue = if (isPressed) PressBackgroundColor else DefaultBackgroundColor,  // 눌렀을 때 배경색 변화
+    label = "Background Color Animation"
+)
 
 Lazy(Column/Row/grids)
     - 여러개의 데이터 리스트를 View로 나타낼때 사용됨, 리사이클러뷰와 비슷한 기능

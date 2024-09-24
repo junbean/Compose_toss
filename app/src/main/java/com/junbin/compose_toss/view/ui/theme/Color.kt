@@ -48,3 +48,6 @@ val DefaultTextColor = Color.Black
 val DefaultDarkTextColor = Color.DarkGray
 val DefaultGrayTextColor = Color.Gray
 
+
+val PressBackgroundColor = Color.LightGray
+val DefaultBackgroundColor = Color.White

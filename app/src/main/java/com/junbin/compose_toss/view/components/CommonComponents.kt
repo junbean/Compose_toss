@@ -1,17 +1,25 @@
 package com.junbin.compose_toss.view.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.Interaction
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -19,6 +27,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalMinimumInteractiveComponentEnforcement
+import androidx.compose.material3.TabPosition
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -28,12 +37,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.junbin.compose_toss.model.data.StockData
@@ -42,6 +54,8 @@ import com.junbin.compose_toss.view.ui.theme.CommonRowBoxDecreaseColor
 import com.junbin.compose_toss.view.ui.theme.CommonRowBoxIconColor
 import com.junbin.compose_toss.view.ui.theme.CommonRowBoxIncreaseColor
 import com.junbin.compose_toss.view.ui.theme.CommonRowBoxTextColor
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 @Composable
 fun CommonImage(
@@ -142,3 +156,37 @@ fun CommonRowItem(index: Int, stockData: StockData) {
         }
     }
 }
+
+//modifier
+fun Modifier.customTabIndicatorOffset(
+    currentTabPosition: TabPosition,
+    tabWidth: Dp
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "customTabIndicatorOffset"
+        value = currentTabPosition
+    }
+) {
+    val currentTabWidth by animateDpAsState(
+        targetValue = tabWidth,
+        label = " ",
+        animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing,
+        )
+    )
+    val indicatorOffset by animateDpAsState(
+        targetValue = ((currentTabPosition.left + currentTabPosition.right - tabWidth) / 2),
+        label = " ",
+        animationSpec = tween(durationMillis = 250, easing = FastOutSlowInEasing)
+    )
+    fillMaxWidth()
+        .wrapContentSize(Alignment.BottomStart)
+        .offset(x = indicatorOffset)
+        .width(currentTabWidth)
+}
+
+class NoRippleInteractionSource : MutableInteractionSource {
+    override val interactions: Flow<Interaction> = emptyFlow()
+    override suspend fun emit(interaction: Interaction) {}
+    override fun tryEmit(interaction: Interaction) = true
+}
+

@@ -1,6 +1,8 @@
 package com.junbin.compose_toss.view
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
@@ -23,12 +26,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.junbin.compose_toss.R
 import com.junbin.compose_toss.model.data.NavItem
-import com.junbin.compose_toss.view.components.TopBarModule
 import com.junbin.compose_toss.view.screens.BoonPage
 import com.junbin.compose_toss.view.screens.HomePage
 import com.junbin.compose_toss.view.screens.MenuPage
-import com.junbin.compose_toss.view.screens.stockPage.StockPage
 import com.junbin.compose_toss.view.screens.TossPayPage
+import com.junbin.compose_toss.view.screens.stockPage.StockPage
 import com.junbin.compose_toss.view.ui.theme.BottomNavigationBorderColor
 
 
@@ -88,11 +90,17 @@ fun MainScreen() {
 
 @Composable
 fun ContentScreen(modifier: Modifier = Modifier, selectedIndex: Int) {
-    when (selectedIndex) {
-        0 -> HomePage()
-        1 -> BoonPage()
-        2 -> TossPayPage()
-        3 -> StockPage()
-        4 -> MenuPage()
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        when (selectedIndex) {
+            0 -> HomePage()
+            1 -> BoonPage()
+            2 -> TossPayPage()
+            3 -> StockPage()
+            4 -> MenuPage()
+        }
     }
 }
