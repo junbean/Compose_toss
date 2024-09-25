@@ -6,7 +6,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,8 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
@@ -35,7 +32,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -63,9 +59,9 @@ import com.junbin.compose_toss.R
 import com.junbin.compose_toss.model.data.LooAroundData
 import com.junbin.compose_toss.model.data.NewsData
 import com.junbin.compose_toss.model.data.StockData
-import com.junbin.compose_toss.view.components.CommonRowItem
-import com.junbin.compose_toss.view.components.NoRippleInteractionSource
-import com.junbin.compose_toss.view.components.customTabIndicatorOffset
+import com.junbin.compose_toss.view.common.CommonRowItem
+import com.junbin.compose_toss.view.common.NoRippleInteractionSource
+import com.junbin.compose_toss.view.common.customTabIndicatorOffset
 import com.junbin.compose_toss.view.ui.theme.BackgroundColor
 import com.junbin.compose_toss.view.ui.theme.CommonRowBoxColor
 import com.junbin.compose_toss.view.ui.theme.DecreaseStockBoxColor

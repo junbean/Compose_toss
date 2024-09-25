@@ -1,4 +1,4 @@
-package com.junbin.compose_toss.view.components
+package com.junbin.compose_toss.view.common
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState

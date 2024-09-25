@@ -38,7 +38,6 @@ val CommonRowBoxIncreaseColor = Color.Red
 val CommonRowBoxDecreaseColor = Color.Blue
 val CommonRowBoxIconColor = Color.Gray
 
-
 //partition
 val PartitionColor = Color(0xFFEFEFEF)
 val DivideLineColor = Color(0xFFEFEFEF)
@@ -48,6 +47,14 @@ val DefaultTextColor = Color.Black
 val DefaultDarkTextColor = Color.DarkGray
 val DefaultGrayTextColor = Color.Gray
 
+//footer
+val FooterBackgroundColor = Color(0xFFEFEFEF)
+val FooterIconColor = Color.Gray
+val FooterTextColor = Color.Gray
+val FooterFocusTextColor = Color.DarkGray
 
 val PressBackgroundColor = Color.LightGray
 val DefaultBackgroundColor = Color.White
+val BrightGrayBackgroundColor = Color(0xFFEFEFEF)
+val LightGrayBackgroundColor = Color.LightGray
+//val BrightGrayBackgroundColor = Color(0xFFF7F7F7)

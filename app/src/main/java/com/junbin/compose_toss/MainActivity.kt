@@ -12,7 +12,6 @@ import com.junbin.compose_toss.viewmodel.StockViewModel
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val stockViewModel = ViewModelProvider(this)[StockViewModel::class]
         enableEdgeToEdge()
         setContent {
             Compose_tossTheme {
